@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS AI - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js Setup -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <!-- Background Animation (Auto-injected by script) -->
+
+    <div class="jarvis-demo">
+      <div class="jarvis-demo-header">
+        <div>
+          <span class="jarvis-demo-kicker">LIVE DEMO</span>
+          <h4>Ask JARVIS</h4>
+        </div>
+        <span class="jarvis-demo-status">ONLINE</span>
+      </div>
+
+      <div class="jarvis-chat" id="jarvis-chat">
+        <div class="jarvis-message bot">
+          Please select a language first: Bengali, Hindi, or English.
+        </div>
+      </div>
+
+      <div class="jarvis-language-panel">
+        <button type="button" data-jarvis-language="bn">Bengali</button>
+        <button type="button" data-jarvis-language="hi">Hindi</button>
+        <button type="button" data-jarvis-language="en" class="active">English</button>
+      </div>
+
+      <div class="jarvis-quick-actions">
+        <button type="button" data-jarvis-question="What is the current time?">Time</button>
+        <button type="button" data-jarvis-question="What is 7 x 7?">7 x 7</button>
+      </div>
+
+      <form class="jarvis-input-row" id="jarvis-form">
+        <input type="text" id="jarvis-input" placeholder="Ask Jarvis..." autocomplete="off">
+        <button type="button" class="jarvis-tool-btn active" id="jarvis-voice">VOICE ON</button>
+        <button type="submit">Ask</button>
+      </form>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="bg-animation.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

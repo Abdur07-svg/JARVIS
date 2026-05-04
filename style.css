@@ -1,0 +1,252 @@
+:root {
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0, 212, 255, 0.15);
+  --cyan-glow: rgba(0, 212, 255, 0.35);
+  --bg: #03040d;
+  --bg-card: rgba(10, 11, 13, 0.85);
+  --text: #e3e3e3;
+  --text-muted: #8e918f;
+  --border: rgba(255, 255, 255, 0.1);
+  --green: #00ff88;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-image: 
+    radial-gradient(circle at 18% 18%, rgba(0, 212, 255, 0.1) 0 2px, transparent 3px),
+    linear-gradient(135deg, #03040d 0%, #06172b 100%);
+  background-attachment: fixed;
+}
+
+/* Background Canvas */
+canvas {
+ position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* ক্যানভাসকে সবার নিচে পাঠাবে */
+  pointer-events: none; /* ক্যানভাসে ক্লিক ইভেন্ট যাবে না */
+}
+
+/* মেইন কন্টেইনার - ফুল স্ক্রিন ভিউ */
+.jarvis-demo {
+  width: 100%;
+  height: 100%;
+  max-width: 1000px;
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* হেডার সেকশন */
+.jarvis-demo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.jarvis-demo h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  color: var(--cyan);
+}
+
+.jarvis-demo-status {
+  color: var(--green);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jarvis-demo-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--green);
+}
+
+/* চ্যাট এরিয়া */
+.jarvis-chat {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 10px;
+  margin-bottom: 20px;
+}
+
+.jarvis-message {
+  max-width: 80%;
+  padding: 12px 18px;
+  border-radius: 18px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.jarvis-message.bot {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+}
+
+.jarvis-message.user {
+  align-self: flex-end;
+  background: var(--cyan-dim);
+  border: 1px solid var(--cyan);
+  color: #fff;
+}
+
+/* --- আপডেটেড বাটন সেকশন (Language & Quick Actions) --- */
+.jarvis-language-panel, .jarvis-quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.jarvis-language-panel button, .jarvis-quick-actions button {
+  padding: 8px 18px;
+  border-radius: 25px; /* Pill shape */
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.05);
+  color: #9eeeff;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* মাউস নিলে বাটনটি গ্লো করবে এবং হালকা উপরে উঠবে */
+.jarvis-language-panel button:hover, .jarvis-quick-actions button:hover {
+  background: rgba(0, 212, 255, 0.15);
+  border-color: var(--cyan);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+/* একটিভ বাটন (সিলেক্ট করা হলে) */
+.jarvis-language-panel button.active, .jarvis-language-panel button:focus {
+  background: var(--cyan) !important;
+  color: #020b18 !important;
+  border-color: var(--cyan) !important;
+  box-shadow: 0 0 15px var(--cyan-glow);
+}
+
+/* কুইক অ্যাকশন বাটনের জন্য একটু ভিন্ন রঙ (সবুজ আভা) */
+.jarvis-quick-actions button {
+  border-color: rgba(0, 255, 136, 0.3);
+  background: rgba(0, 255, 136, 0.05);
+  color: #a7ffd9;
+}
+
+.jarvis-quick-actions button:hover {
+  border-color: var(--green);
+  background: rgba(0, 255, 136, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+/* ইনপুট এরিয়া - GEMINI STYLE */
+.jarvis-input-row {
+  background: #1e1f20;
+  border-radius: 32px;
+  padding: 8px 12px 8px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  transition: border 0.3s ease, background 0.3s ease;
+}
+
+.jarvis-input-row:focus-within {
+  border: 1px solid rgba(0, 212, 255, 0.4);
+  background: #252627;
+}
+
+.jarvis-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 0;
+}
+
+.jarvis-input-row input::placeholder {
+  color: var(--text-muted);
+}
+
+/* আইকন বাটনগুলো */
+.jarvis-input-row button, .jarvis-tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.jarvis-input-row button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--cyan);
+}
+
+.jarvis-input-row button[type="submit"], .ask-btn {
+  color: var(--cyan);
+}
+
+/* কাস্টম স্ক্রলবার */
+.jarvis-chat::-webkit-scrollbar {
+  width: 5px;
+}
+.jarvis-chat::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+@media (max-width: 600px) {
+  .jarvis-demo {
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 16px;
+  }
+}
