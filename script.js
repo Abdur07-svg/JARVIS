@@ -207,9 +207,11 @@ for (let i = 0; i < 50; i++) {
   }
 
   function setJarvisLanguageButtons() {
-    jarvisLanguageButtons.forEach(function(button) {
-      button.classList.toggle('active', button.getAttribute('data-jarvis-language') === jarvisLanguage);
+    // Sync both old [data-jarvis-language] selectors and new .lang-btn
+    document.querySelectorAll('[data-jarvis-language]').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-jarvis-language') === jarvisLanguage);
     });
+    if (window.updateJarvisStats) window.updateJarvisStats(jarvisLanguage, jarvisVoiceEnabled);
   }
 
   function getJarvisDayPeriod(hour) {
@@ -308,10 +310,17 @@ for (let i = 0; i < 50; i++) {
   function addJarvisMessage(text, sender) {
     const message = document.createElement('div');
     message.className = 'jarvis-message ' + sender;
-    message.textContent = text;
+    const icon = document.createElement('span');
+    icon.className = 'mi';
+    icon.textContent = sender === 'user' ? '▶' : '◈';
+    const textEl = document.createElement('span');
+    textEl.className = 'mt';
+    textEl.textContent = text;
+    message.appendChild(icon);
+    message.appendChild(textEl);
     jarvisChat.appendChild(message);
     jarvisChat.scrollTop = jarvisChat.scrollHeight;
-    return message;
+    return textEl; // return textEl so thinking placeholder update works
   }
 
   function speakJarvis(text) {
@@ -351,8 +360,10 @@ for (let i = 0; i < 50; i++) {
   }
 
   function setJarvisVoiceButton() {
-    jarvisVoiceButton.textContent = jarvisVoiceEnabled ? 'VOICE ON' : 'VOICE OFF';
+    if (!jarvisVoiceButton) return;
     jarvisVoiceButton.classList.toggle('active', jarvisVoiceEnabled);
+    jarvisVoiceButton.textContent = jarvisVoiceEnabled ? '🎙' : '🔇';
+    if (window.updateJarvisStats) window.updateJarvisStats(jarvisLanguage, jarvisVoiceEnabled);
   }
 
   function waitForJarvisVoices() {

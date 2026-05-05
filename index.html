@@ -1,59 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS AI - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Three.js Setup -->
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
-    }
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#020810">
+  <title>JARVIS — Abdur's AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Animation (Auto-injected by script) -->
 
-    <div class="jarvis-demo">
-      <div class="jarvis-demo-header">
-        <div>
-          <span class="jarvis-demo-kicker">LIVE DEMO</span>
-          <h4>Ask JARVIS</h4>
-        </div>
-        <span class="jarvis-demo-status">ONLINE</span>
-      </div>
+  <div class="hud-corner top-left"></div>
+  <div class="hud-corner top-right"></div>
+  <div class="hud-corner bottom-left"></div>
+  <div class="hud-corner bottom-right"></div>
+  <div class="scanlines"></div>
+  <canvas id="bg-canvas"></canvas>
 
-      <div class="jarvis-chat" id="jarvis-chat">
-        <div class="jarvis-message bot">
-          Please select a language first: Bengali, Hindi, or English.
-        </div>
-      </div>
-
-      <div class="jarvis-language-panel">
-        <button type="button" data-jarvis-language="bn">Bengali</button>
-        <button type="button" data-jarvis-language="hi">Hindi</button>
-        <button type="button" data-jarvis-language="en" class="active">English</button>
-      </div>
-
-      <div class="jarvis-quick-actions">
-        <button type="button" data-jarvis-question="What is the current time?">Time</button>
-        <button type="button" data-jarvis-question="What is 7 x 7?">7 x 7</button>
-      </div>
-
-      <form class="jarvis-input-row" id="jarvis-form">
-        <input type="text" id="jarvis-input" placeholder="Ask Jarvis..." autocomplete="off">
-        <button type="button" class="jarvis-tool-btn active" id="jarvis-voice">VOICE ON</button>
-        <button type="submit">Ask</button>
-      </form>
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <div class="loader-ring r2"></div>
+    <div class="loader-ring r3"></div>
+    <div class="loader-text">
+      <span id="loader-label">INITIALIZING</span>
+      <span class="dots"><span>.</span><span>.</span><span>.</span></span>
     </div>
+    <div class="lbar-wrap"><div class="lbar"></div></div>
+  </div>
 
-    <!-- Scripts -->
-    <script type="module" src="bg-animation.js"></script>
-    <script src="script.js"></script>
+  <!-- SHELL -->
+  <div class="shell" id="shell">
+
+    <!-- LEFT PANEL (desktop only) -->
+    <aside class="panel-left">
+      <div class="avatar-wrap">
+        <div class="av-ring r1"></div>
+        <div class="av-ring r2l"></div>
+        <div class="av-ring r3l"></div>
+        <div class="av-core">
+          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+            <polygon points="40,12 64,54 16,54" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.7"/>
+            <circle cx="40" cy="40" r="10" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1"/>
+            <circle cx="40" cy="40" r="4" fill="#00d4ff"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="av-name">JARVIS</div>
+      <div class="av-sub">A.I. ASSISTANT</div>
+
+      <div class="stat-list">
+        <div class="stat"><span class="sk">STATUS</span><span class="sv green">ONLINE</span></div>
+        <div class="stat"><span class="sk">LANG</span><span class="sv" id="stat-lang">ENGLISH</span></div>
+        <div class="stat"><span class="sk">VOICE</span><span class="sv" id="stat-voice">ACTIVE</span></div>
+        <div class="stat"><span class="sk">BUILD</span><span class="sv">v2.5.0</span></div>
+        <div class="stat"><span class="sk">WIKI</span><span class="sv green">LINKED</span></div>
+      </div>
+
+      <div class="sig-bars">
+        <div class="sb"></div><div class="sb"></div><div class="sb"></div>
+        <div class="sb"></div><div class="sb"></div>
+      </div>
+      <div class="av-credit">BUILT BY ABDUR</div>
+    </aside>
+
+    <!-- MAIN PANEL -->
+    <main class="panel-main">
+
+      <header class="top-bar">
+        <div class="tb-left">
+          <div class="live-dot"></div>
+          <span class="tb-title">JARVIS</span>
+        </div>
+        <div class="tb-typing">
+          <span id="typing-text"></span><span class="cur">|</span>
+        </div>
+        <div class="tb-time" id="header-time">--:--</div>
+      </header>
+
+      <!-- Language Bar — always visible on all devices -->
+      <div class="lang-bar">
+        <span class="lang-label">LANGUAGE</span>
+        <button type="button" data-jarvis-language="bn" class="lang-btn">বাংলা</button>
+        <button type="button" data-jarvis-language="hi" class="lang-btn">हिन्दी</button>
+        <button type="button" data-jarvis-language="en" class="lang-btn active">English</button>
+      </div>
+
+      <!-- Chat -->
+      <div class="chat-area" id="jarvis-chat">
+        <div class="jarvis-message bot">
+          <span class="mi">◈</span>
+          <span class="mt">Language select করো, তারপর JARVIS-এর সাথে কথা বলো!</span>
+        </div>
+      </div>
+
+      <!-- Quick Buttons -->
+      <div class="quick-bar">
+        <button type="button" data-jarvis-question="What is the current time?" class="qb">⏱ Time</button>
+        <button type="button" data-jarvis-question="What is today's date?" class="qb">📅 Date</button>
+        <button type="button" data-jarvis-question="What is 7 x 7?" class="qb">✕ 7×7</button>
+        <button type="button" data-jarvis-question="Who are you?" class="qb">◈ Who?</button>
+        <button type="button" data-jarvis-question="Who is Abdur?" class="qb">👤 Abdur</button>
+      </div>
+
+      <!-- Input -->
+      <div class="input-row">
+        <input type="text" id="jarvis-input"
+          placeholder="Ask JARVIS..."
+          autocomplete="off" autocorrect="off"
+          spellcheck="false" inputmode="text">
+        <button type="button" id="jarvis-voice" class="voice-btn active">🎙</button>
+        <button type="button" id="jarvis-submit" class="send-btn">▶</button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
