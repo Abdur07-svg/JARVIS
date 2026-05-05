@@ -23,8 +23,14 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  width: 100%; height: 100%;
+html {
+  height: 100%;
+  height: -webkit-fill-available;
+}
+body {
+  width: 100%;
+  height: 100%;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
@@ -106,8 +112,8 @@ html, body {
 
 /* ── SHELL ── */
 .shell {
-  position: relative; z-index: 3;
-  width: 100vw; height: 100vh;
+  position: fixed; inset: 0; z-index: 3;
+  width: 100%; height: 100%;
   display: flex;
   opacity: 0; transition: opacity 0.5s ease 0.2s;
 }
@@ -122,6 +128,8 @@ html, body {
   align-items: center;
   padding: 28px 14px 20px;
   backdrop-filter: blur(14px);
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Avatar */
@@ -187,7 +195,7 @@ html, body {
 .panel-main {
   flex: 1; min-width: 0;
   display: flex; flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background: rgba(3,8,18,0.88);
   backdrop-filter: blur(8px);
   overflow: hidden;
@@ -342,12 +350,14 @@ html, body {
 /* ── INPUT ROW ── */
 .input-row {
   display: flex; align-items: center;
-  margin: 0 14px 14px;
+  margin: 0 12px 12px;
   background: rgba(0,6,18,0.92);
   border: 1px solid var(--border); border-radius: 40px;
   overflow: hidden;
   transition: border-color 0.25s, box-shadow 0.25s;
   flex-shrink: 0;
+  /* safe area for notch phones */
+  margin-bottom: max(12px, env(safe-area-inset-bottom, 12px));
 }
 .input-row:focus-within {
   border-color: var(--cyan);
@@ -396,7 +406,4 @@ html, body {
 @keyframes sigPulse  { 0%,100%{background:var(--cyan-border)} 50%{background:var(--cyan)} }
 @keyframes msgIn     { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
 
-/* ── SAFE AREA (notch phones) ── */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .input-row { margin-bottom: max(14px, env(safe-area-inset-bottom)); }
-}
+/* ── SAFE AREA handled inline in .input-row ── */
