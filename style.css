@@ -83,12 +83,12 @@ body {
 .loader-ring {
   position: absolute; border-radius: 50%;
   border: 1.5px solid transparent;
-  border-top-color: var(--cyan);
+  border-top-color: var(--amber);
   animation: spin 1.4s linear infinite;
   width: 90px; height: 90px;
 }
-.loader-ring.r2 { width: 68px; height: 68px; border-top-color: var(--green); animation-duration: 0.9s; animation-direction: reverse; }
-.loader-ring.r3 { width: 48px; height: 48px; border-top-color: var(--amber); animation-duration: 0.6s; }
+.loader-ring.r2 { width: 68px; height: 68px; border-top-color: var(--white); animation-duration: 0.9s; animation-direction: reverse; }
+.loader-ring.r3 { width: 48px; height: 48px; border-top-color: var(--green); animation-duration: 0.6s; }
 
 .loader-text {
   margin-top: 80px;
