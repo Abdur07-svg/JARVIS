@@ -1,5 +1,4 @@
-// api/gemini.js — Vercel Serverless Function
-// Gemini API Proxy with CORS support
+// api/gemini.js — Fixed version
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -7,67 +6,38 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { question, language } = req.body;
-
-  if (!question) {
-    return res.status(400).json({ error: 'Question is required' });
-  }
-
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
   if (!GEMINI_API_KEY) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
-  // Language-specific system prompts
-  const systemPrompts = {
-    bn: `তুমি JARVIS, Abdur-এর ব্যক্তিগত AI সহায়ক। তুমি বাংলায় উত্তর দাও। 
-    সংক্ষিপ্ত, সঠিক এবং সহজভাবে উত্তর দাও। যদি কোনো তথ্য নিশ্চিত না হও, তাহলে সত্যি কথা বলো।
-    বর্তমান সময়ের তথ্য (IPL, weather, Bitcoin, news) সঠিকভাবে দাও।`,
-
-    hi: `आप JARVIS हैं, Abdur का व्यक्तिगत AI सहायक। आप हिंदी में जवाब दें।
-    संक्षिप्त, सटीक और सरल तरीके से जवाब दें। यदि कोई जानकारी निश्चित नहीं है, तो सच बोलें।
-    वर्तमान समय की जानकारी (IPL, weather, Bitcoin, news) सही दें।`,
-
-    en: `You are JARVIS, Abdur's personal AI assistant. Answer in English.
-    Be concise, accurate, and helpful. If unsure about any information, be honest.
-    Provide accurate real-time information (IPL, weather, Bitcoin, news, current events).`
+  const prompts = {
+    bn: `তুমি JARVIS, Abdur-এর AI assistant। বাংলায় সংক্ষিপ্ত, সঠিক উত্তর দাও।`,
+    hi: `आप JARVIS हैं, Abdur का AI assistant। हिंदी में संक्षिप्त, सटीक जवाब दें।`,
+    en: `You are JARVIS, Abdur's AI assistant. Be concise and accurate.`
   };
 
-  const prompt = systemPrompts[language] || systemPrompts.en;
-
   try {
+    // ✅ FIXED: Model name updated to gemini-2.0-flash
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${prompt}\n\nUser Question: ${question}\n\nPlease provide a helpful, accurate answer.`
-                }
-              ]
-            }
-          ],
+          contents: [{
+            parts: [{
+              text: `${prompts[language] || prompts.en}\n\nUser: ${question}\n\nAnswer:`
+            }]
+          }],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 800,
-            topP: 0.8,
-            topK: 40
+            maxOutputTokens: 800
           }
         })
       }
@@ -79,16 +49,9 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    
-    // Extract text from Gemini response
-    const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                   'Sorry, I could not generate a response.';
+    const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response.';
 
-    return res.status(200).json({ 
-      answer: answer.trim(),
-      source: 'gemini',
-      language: language || 'en'
-    });
+    return res.status(200).json({ answer: answer.trim() });
 
   } catch (error) {
     console.error('Gemini API Error:', error);
