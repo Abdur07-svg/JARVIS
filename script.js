@@ -800,34 +800,67 @@ for (let i = 0; i < 50; i++) {
     }
   }
 
-  async function handleJarvisQuestion(question) {
-  if (!question) return;
+  // ============================================
+// GEMINI API FALLBACK — নতুন যোগ করা হলো
+// ============================================
 
+const GEMINI_API_URL = '/api/gemini';
+
+const jarvisRealtimeTopics = [
+  'ipl', 'cricket', 'match', 'score', 'weather', 'temperature',
+  'bitcoin', 'crypto', 'ethereum', 'stock', 'market', 'price',
+  'news', 'today', 'yesterday', 'tomorrow', 'current', 'live',
+  'who won', 'forecast', 'usd', 'inr', 'rate', 'election',
+  'kkr', 'rcb', 'csk', 'mi', 'srh', 'rr', 'pbks', 'dc', 'gt', 'lsg'
+];
+
+function needsGeminiFallback(question) {
+  const clean = question.toLowerCase();
+  return jarvisRealtimeTopics.some(topic => clean.includes(topic));
+}
+
+async function fetchGeminiReply(question, language) {
+  try {
+    const response = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, language: language || 'en' })
+    });
+    if (!response.ok) throw new Error('Gemini API failed');
+    const data = await response.json();
+    return data.answer;
+  } catch (error) {
+    console.error('Gemini Error:', error);
+    return null;
+  }
+}
+
+// ============================================
+// UPDATED handleJarvisQuestion
+// ============================================
+
+  // ❌ PURONO CODE (এটা delete করো):
+async function handleJarvisQuestion(question) {
+  if (!question) return;
   addJarvisMessage(question, 'user');
   jarvisInput.value = '';
-
   const localReply = getJarvisReply(question);
-
   if (localReply) {
     showJarvisReply(localReply, 0);
     return;
   }
-
   const mathReply = getMathReply(question);
-
   if (mathReply) {
     showJarvisReply(mathReply, 0);
     return;
   }
   const thinkingMessage = addJarvisMessage(getJarvisLanguageConfig().thinking, 'bot');
   let leaderReply = null;
-
   try {
     leaderReply = await getLeaderReply(question);
   } catch (error) {
     leaderReply = null;
   }
-
   const finalReply = leaderReply || await getWikipediaReply(question);
   thinkingMessage.textContent = finalReply;
   jarvisChat.scrollTop = jarvisChat.scrollHeight;
