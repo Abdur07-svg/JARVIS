@@ -363,11 +363,21 @@ for (let i = 0; i < 50; i++) {
   }
 
   function setJarvisVoiceButton() {
-    if (!jarvisVoiceButton) return;
-    jarvisVoiceButton.classList.toggle('active', jarvisVoiceEnabled);
-    jarvisVoiceButton.textContent = jarvisVoiceEnabled ? '🎙' : '🔇';
-    if (window.updateJarvisStats) window.updateJarvisStats(jarvisLanguage, jarvisVoiceEnabled);
+
+  if (!jarvisVoiceButton) return;
+
+  jarvisVoiceButton.classList.toggle('active', jarvisVoiceEnabled);
+
+  jarvisVoiceButton.innerHTML = jarvisVoiceEnabled
+    ? '<i data-lucide="volume-2"></i>'
+    : '<i data-lucide="volume-x"></i>';
+
+  lucide.createIcons();
+
+  if (window.updateJarvisStats) {
+    window.updateJarvisStats(jarvisLanguage, jarvisVoiceEnabled);
   }
+}
 
   function waitForJarvisVoices() {
     return new Promise(function(resolve) {
